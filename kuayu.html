@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>跨域总结</title>
+	</head>
+	<body>
+		
+		<button id="btn" onclick="send()">跨域请求数据</button>
+		<p>
+			跨域问题的出现是因为浏览器的同源策略问题，常见的跨域问题有一下几种方法：
+			1.jsonp，使用的是img或者script标签的src属性的跨域能力，只能使用get请求
+			2.（CORS）跨域资源共享是一份浏览器技术的规范，后台服务器增加响应的一些响应头
+				Access-Control-Allow-Origin: *
+				Access-Control-Allow-Methods: POST, GET, OPTIONS
+				Access-Control-Allow-Headers: X-PINGOTHER, Content-Type
+				Access-Control-Max-Age: 86400
+			3.服务器代理，我们向后台服务器请求数据，后台服务器帮我们去其他服务器请求数据并且返回给客户端。
+			4.在vue项目中实现跨域,在webpack文件中作相应的配置：在config文件夹中的index.js文件中
+				proxyTable属性里面添加一下配置
+				'/api': {  //使用"/api"来代替"http://localhost:8181" 
+			    target: 'http://localhost:8181', //源地址 
+			    changeOrigin: true, //改变源 ,允许跨域
+			    pathRewrite: { 
+			      '^/api': 'http://localhost:8181' //路径重写 ，'/api'=='http://localhost:8181'
+			      } 
+			  } 
+		</p>
+		
+		<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+		<script type="text/javascript">
+			//////使用jq封装的jsonp方法:回调函数使用？代替，jq会自动帮我们生成一个全局的函数，获取到数据之后会自动销毁。
+//			function send(){
+//				$.getJSON('http://localhost:8181/getInfo?callback=?',function(data){
+//					console.log(data);
+//				})
+//			}	
+//		
+		
+			//////自己封装的jsonp方法：
+			function send(){
+				document.querySelector('#btn');
+				var script=document.createElement('script');
+				script.src='http://localhost:8181/getInfo?callback=solve';
+				var head=document.getElementsByTagName('head')[0]
+				head.appendChild(script);
+				head.lastElementChild.remove();
+			}
+			
+			//跨域获取数据的回调函数
+			function solve(data){
+				console.log(data);
+			}
+
+		</script>
+	</body>
+</html>
